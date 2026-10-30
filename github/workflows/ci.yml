@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.15.0
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Verificar código
+        run: pnpm lint
+
+      - name: Executar testes
+        run: pnpm test
+
+      - name: Gerar build
+        run: pnpm build
